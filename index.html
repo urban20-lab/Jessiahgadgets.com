@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure OTP Verification</title>
+    <title>Secure Account Access</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -24,44 +23,18 @@
         }
         
         .container {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 450px;
             overflow: hidden;
-            position: relative;
-        }
-        
-        .admin-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #f1f8ff;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #2575fc;
-            font-size: 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            z-index: 10;
-        }
-        
-        .admin-btn:hover {
-            background: #e1efff;
-            transform: rotate(30deg);
         }
         
         .header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: #2c3e50;
             color: white;
-            padding: 25px 30px;
+            padding: 25px;
             text-align: center;
         }
         
@@ -72,711 +45,259 @@
         }
         
         .header p {
-            font-size: 14px;
+            font-size: 15px;
             opacity: 0.9;
         }
         
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #aaa, transparent);
+            margin: 5px 0;
+        }
+        
         .form-container {
-            padding: 30px;
-        }
-        
-        .form-step {
-            display: none;
-        }
-        
-        .form-step.active {
-            display: block;
+            padding: 25px;
         }
         
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .input-group label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
-            font-size: 14px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 16px;
         }
         
-        .input-group input {
+        .input-field {
             width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
+            padding: 15px;
+            border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            transition: border 0.3s;
+            transition: border-color 0.3s;
         }
         
-        .input-group input:focus {
-            border-color: #6a11cb;
+        .input-field:focus {
+            border-color: #3498db;
             outline: none;
         }
         
         .btn {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: #3498db;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 15px;
             width: 100%;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: background 0.3s;
         }
         
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+            background: #2980b9;
         }
         
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .otp-container {
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-        
-        .otp-container input {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-        }
-        
-        .otp-container input:focus {
-            border-color: #6a11cb;
-            outline: none;
-        }
-        
-        .resend {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        
-        .resend a {
-            color: #2575fc;
-            text-decoration: none;
-            font-weight: 500;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            transition: transform 0.3s;
         }
         
-        .resend a:hover {
-            text-decoration: underline;
+        .settings-icon:hover {
+            transform: rotate(45deg);
         }
         
-        .resend a.disabled {
-            color: #999;
-            cursor: not-allowed;
+        .settings-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            width: 250px;
+            display: none;
+            z-index: 10;
+        }
+        
+        .settings-panel h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .settings-option {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
         }
         
         .success-message {
-            text-align: center;
-            padding: 30px;
-            display: none;
-        }
-        
-        .success-message i {
-            font-size: 60px;
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
-        
-        .success-message h2 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-        
-        .success-message p {
-            color: #666;
-            line-height: 1.5;
-        }
-        
-        .error {
-            color: #ff3860;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .timer {
-            text-align: center;
-            color: #ff3860;
-            font-weight: 500;
-            margin-top: 5px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Admin Panel Styles */
-        .admin-panel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .admin-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 99;
-        }
-        
-        .admin-panel h2 {
-            color: #2575fc;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .admin-input {
-            margin-bottom: 15px;
-        }
-        
-        .admin-input label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        .admin-input input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        
-        .admin-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 10px;
-        }
-        
-        .admin-btn-primary {
-            background: #2575fc;
+            background: #2ecc71;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            flex: 1;
-        }
-        
-        .admin-btn-secondary {
-            background: #f1f1f1;
-            color: #333;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            flex: 1;
-        }
-        
-        .config-status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
             display: none;
         }
         
-        .config-status.success {
-            background: #e8f5e9;
-            color: #4CAF50;
-            display: block;
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
         }
         
-        .config-status.error {
-            background: #ffebee;
-            color: #ff3860;
-            display: block;
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 5px;
+        }
+        
+        .step.active {
+            background: #3498db;
         }
         
         @media (max-width: 480px) {
             .container {
-                border-radius: 10px;
+                margin: 10px;
             }
             
-            .otp-container input {
-                width: 40px;
-                height: 40px;
+            .header {
+                padding: 20px;
             }
             
             .form-container {
                 padding: 20px;
-            }
-            
-            .admin-actions {
-                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Admin Button -->
-        <button class="admin-btn" id="admin-btn">
-            <i class="fas fa-cog"></i>
-        </button>
-        
         <div class="header">
             <h1>Secure Account Access</h1>
             <p>Verify your identity with one-time password</p>
         </div>
         
+        <div class="step-indicator">
+            <div class="step active"></div>
+            <div class="step"></div>
+            <div class="step"></div>
+        </div>
+        
         <div class="form-container">
-            <!-- Step 1: Email Entry -->
-            <div class="form-step active" id="step1">
-                <div class="input-group">
-                    <label for="email">Enter your email address</label>
-                    <input type="email" id="email" placeholder="name@example.com">
-                    <div class="error" id="email-error">Please enter a valid email address</div>
-                </div>
-                <button class="btn" id="send-otp">
-                    <span id="send-text">Send Verification Code</span>
-                    <span id="send-loading" class="loading" style="display: none;"></span>
-                </button>
+            <div class="input-group">
+                <label for="email">Enter your email address</label>
+                <input type="email" id="email" class="input-field" placeholder="name@example.com" required>
             </div>
             
-            <!-- Step 2: OTP Verification -->
-            <div class="form-step" id="step2">
-                <p style="margin-bottom: 20px; color: #666;">We've sent a 6-digit verification code to <span id="email-display" style="font-weight: 500;">user@example.com</span></p>
-                
-                <div class="input-group">
-                    <label>Enter verification code</label>
-                    <div class="otp-container">
-                        <input type="text" maxlength="1" id="digit1" data-next="digit2">
-                        <input type="text" maxlength="1" id="digit2" data-next="digit3" data-previous="digit1">
-                        <input type="text" maxlength="1" id="digit3" data-next="digit4" data-previous="digit2">
-                        <input type="text" maxlength="1" id="digit4" data-next="digit5" data-previous="digit3">
-                        <input type="text" maxlength="1" id="digit5" data-next="digit6" data-previous="digit4">
-                        <input type="text" maxlength="1" id="digit6" data-previous="digit5">
-                    </div>
-                    <div class="error" id="otp-error">Invalid verification code</div>
-                    <div class="timer" id="timer">02:00</div>
-                </div>
-                
-                <button class="btn" id="verify-otp">
-                    <span id="verify-text">Verify & Continue</span>
-                    <span id="verify-loading" class="loading" style="display: none;"></span>
-                </button>
-                
-                <div class="resend">
-                    Didn't receive the code? <a id="resend-link">Resend</a>
-                    <span id="resend-timer" class="timer" style="display: none;"></span>
-                </div>
+            <button id="verify-btn" class="btn">Send Verification Code</button>
+            
+            <div id="success-message" class="success-message">
+                Verification code sent successfully!
             </div>
         </div>
-        
-        <!-- Success Message -->
-        <div class="success-message" id="success-message">
-            <i class="fas fa-check-circle"></i>
-            <h2>Verification Successful!</h2>
-            <p>Your email has been successfully verified. You now have access to your account.</p>
-        </div>
     </div>
-
-    <!-- Admin Panel (Hidden from regular users) -->
-    <div class="admin-overlay" id="admin-overlay"></div>
-    <div class="admin-panel" id="admin-panel">
-        <h2><i class="fas fa-cog"></i> EmailJS Configuration</h2>
-        <p>Enter your EmailJS credentials to enable OTP emails:</p>
-        
-        <div class="admin-input">
-            <label for="admin-public-key">Public Key:</label>
-            <input type="text" id="admin-public-key" placeholder="Your Public Key">
+    
+    <div class="settings-icon" id="settings-icon">
+        <i class="fas fa-cog"></i>
+    </div>
+    
+    <div class="settings-panel" id="settings-panel">
+        <h3>Settings</h3>
+        <div class="settings-option">
+            <i class="fas fa-bell"></i> Notification Preferences
         </div>
-        
-        <div class="admin-input">
-            <label for="admin-service-id">Service ID:</label>
-            <input type="text" id="admin-service-id" placeholder="Your Service ID">
+        <div class="settings-option">
+            <i class="fas fa-shield-alt"></i> Security Settings
         </div>
-        
-        <div class="admin-input">
-            <label for="admin-template-id">Template ID:</label>
-            <input type="text" id="admin-template-id" placeholder="Your Template ID">
+        <div class="settings-option">
+            <i class="fas fa-language"></i> Language Options
         </div>
-        
-        <div id="admin-config-status" class="config-status"></div>
-        
-        <div class="admin-actions">
-            <button class="admin-btn-secondary" id="admin-cancel">Cancel</button>
-            <button class="admin-btn-primary" id="admin-save">Save Configuration</button>
+        <div class="settings-option">
+            <i class="fas fa-question-circle"></i> Help & Support
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Load saved configuration
-            const publicKey = localStorage.getItem('emailjs_public_key') || '';
-            const serviceID = localStorage.getItem('emailjs_service_id') || '';
-            const templateID = localStorage.getItem('emailjs_template_id') || '';
-            
-            // Initialize EmailJS if public key is available
-            if (publicKey) {
-                emailjs.init(publicKey);
-            }
-            
-            // Admin panel elements
-            const adminBtn = document.getElementById('admin-btn');
-            const adminPanel = document.getElementById('admin-panel');
-            const adminOverlay = document.getElementById('admin-overlay');
-            const adminCancel = document.getElementById('admin-cancel');
-            const adminSave = document.getElementById('admin-save');
-            const adminPublicKey = document.getElementById('admin-public-key');
-            const adminServiceId = document.getElementById('admin-service-id');
-            const adminTemplateId = document.getElementById('admin-template-id');
-            const adminConfigStatus = document.getElementById('admin-config-status');
-            
-            // Set values in admin panel
-            adminPublicKey.value = publicKey;
-            adminServiceId.value = serviceID;
-            adminTemplateId.value = templateID;
-            
-            // Admin panel handlers
-            adminBtn.addEventListener('click', function() {
-                adminPanel.style.display = 'block';
-                adminOverlay.style.display = 'block';
-            });
-            
-            adminCancel.addEventListener('click', function() {
-                adminPanel.style.display = 'none';
-                adminOverlay.style.display = 'none';
-            });
-            
-            adminOverlay.addEventListener('click', function() {
-                adminPanel.style.display = 'none';
-                adminOverlay.style.display = 'none';
-            });
-            
-            adminSave.addEventListener('click', function() {
-                const publicKey = adminPublicKey.value;
-                const serviceID = adminServiceId.value;
-                const templateID = adminTemplateId.value;
-                
-                if (publicKey && serviceID && templateID) {
-                    localStorage.setItem('emailjs_public_key', publicKey);
-                    localStorage.setItem('emailjs_service_id', serviceID);
-                    localStorage.setItem('emailjs_template_id', templateID);
-                    
-                    emailjs.init(publicKey);
-                    
-                    adminConfigStatus.textContent = 'Configuration saved successfully!';
-                    adminConfigStatus.className = 'config-status success';
-                    
-                    setTimeout(() => {
-                        adminPanel.style.display = 'none';
-                        adminOverlay.style.display = 'none';
-                    }, 1500);
-                } else {
-                    adminConfigStatus.textContent = 'Please fill in all fields';
-                    adminConfigStatus.className = 'config-status error';
-                }
-            });
-            
-            // OTP Verification Code
-            // Elements
-            const step1 = document.getElementById('step1');
-            const step2 = document.getElementById('step2');
-            const successMessage = document.getElementById('success-message');
+            const settingsIcon = document.getElementById('settings-icon');
+            const settingsPanel = document.getElementById('settings-panel');
+            const verifyBtn = document.getElementById('verify-btn');
             const emailInput = document.getElementById('email');
-            const emailDisplay = document.getElementById('email-display');
-            const sendOtpBtn = document.getElementById('send-otp');
-            const sendText = document.getElementById('send-text');
-            const sendLoading = document.getElementById('send-loading');
-            const verifyOtpBtn = document.getElementById('verify-otp');
-            const verifyText = document.getElementById('verify-text');
-            const verifyLoading = document.getElementById('verify-loading');
-            const resendLink = document.getElementById('resend-link');
-            const resendTimer = document.getElementById('resend-timer');
-            const emailError = document.getElementById('email-error');
-            const otpError = document.getElementById('otp-error');
-            const timerDisplay = document.getElementById('timer');
+            const successMessage = document.getElementById('success-message');
             
-            // OTP digits
-            const digitInputs = [
-                document.getElementById('digit1'),
-                document.getElementById('digit2'),
-                document.getElementById('digit3'),
-                document.getElementById('digit4'),
-                document.getElementById('digit5'),
-                document.getElementById('digit6')
-            ];
-            
-            // State variables
-            let generatedOtp = '';
-            let timerInterval;
-            let resendTimerInterval;
-            let timeLeft = 120; // 2 minutes in seconds
-            let canResend = false;
-            let resendTimeLeft = 60; // 60 seconds before allowing resend
-
-            // Function to generate a random 6-digit OTP
-            function generateOtp() {
-                return Math.floor(100000 + Math.random() * 900000).toString();
-            }
-            
-            // Function to send OTP via EmailJS
-            function sendOtp(email) {
-                // Show loading state
-                sendText.style.display = 'none';
-                sendLoading.style.display = 'inline-block';
-                sendOtpBtn.disabled = true;
-                
-                // Check if EmailJS is configured
-                const publicKey = localStorage.getItem('emailjs_public_key');
-                const serviceID = localStorage.getItem('emailjs_service_id');
-                const templateID = localStorage.getItem('emailjs_template_id');
-                
-                if (!publicKey || !serviceID || !templateID) {
-                    alert('System is not configured. Please contact administrator.');
-                    sendText.style.display = 'inline-block';
-                    sendLoading.style.display = 'none';
-                    sendOtpBtn.disabled = false;
-                    return;
+            // Toggle settings panel
+            settingsIcon.addEventListener('click', function() {
+                if (settingsPanel.style.display === 'block') {
+                    settingsPanel.style.display = 'none';
+                } else {
+                    settingsPanel.style.display = 'block';
                 }
-                
-                // Initialize EmailJS with the saved public key
-                emailjs.init(publicKey);
-                
-                // Generate OTP
-                generatedOtp = generateOtp();
-                
-                // Prepare email parameters
-                const templateParams = {
-                    to_email: email, // This sends to the email entered by the user
-                    otp: generatedOtp,
-                    from_name: "OTP Verification Service",
-                    to_name: email.split('@')[0]
-                };
-                
-                // Send email using EmailJS
-                emailjs.send(serviceID, templateID, templateParams)
-                    .then(function(response) {
-                        console.log('OTP sent successfully!', response.status, response.text);
-                        
-                        // Show OTP step
-                        step1.classList.remove('active');
-                        step2.classList.add('active');
-                        emailDisplay.textContent = email;
-                        
-                        // Start the timer
-                        startTimer();
-                        startResendTimer();
-                    }, function(error) {
-                        console.error('Failed to send OTP:', error);
-                        alert('Failed to send OTP. Please try again later.');
-                    })
-                    .finally(() => {
-                        // Reset loading state
-                        sendText.style.display = 'inline-block';
-                        sendLoading.style.display = 'none';
-                        sendOtpBtn.disabled = false;
-                    });
-            }
-            
-            // Function to verify OTP
-            function verifyOtp(otp, email) {
-                // Show loading state
-                verifyText.style.display = 'none';
-                verifyLoading.style.display = 'inline-block';
-                verifyOtpBtn.disabled = true;
-                
-                // Simulate API call with timeout
-                setTimeout(() => {
-                    if (otp === generatedOtp && timeLeft > 0) {
-                        // Show success message
-                        step2.classList.remove('active');
-                        successMessage.style.display = 'block';
-                    } else {
-                        otpError.textContent = 'Invalid verification code';
-                        otpError.style.display = 'block';
-                    }
-                    
-                    // Reset loading state
-                    verifyText.style.display = 'inline-block';
-                    verifyLoading.style.display = 'none';
-                    verifyOtpBtn.disabled = false;
-                }, 1000);
-            }
-            
-            // Function to start the countdown timer
-            function startTimer() {
-                clearInterval(timerInterval);
-                timeLeft = 120;
-                updateTimerDisplay();
-                
-                timerInterval = setInterval(function() {
-                    timeLeft--;
-                    updateTimerDisplay();
-                    
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        otpError.textContent = 'OTP has expired';
-                        otpError.style.display = 'block';
-                    }
-                }, 1000);
-            }
-            
-            // Function to start the resend timer
-            function startResendTimer() {
-                clearInterval(resendTimerInterval);
-                canResend = false;
-                resendTimeLeft = 60;
-                resendTimer.textContent = `Resend in ${resendTimeLeft}s`;
-                resendTimer.style.display = 'block';
-                resendLink.classList.add('disabled');
-                
-                resendTimerInterval = setInterval(function() {
-                    resendTimeLeft--;
-                    resendTimer.textContent = `Resend in ${resendTimeLeft}s`;
-                    
-                    if (resendTimeLeft <= 0) {
-                        clearInterval(resendTimerInterval);
-                        resendTimer.style.display = 'none';
-                        resendLink.classList.remove('disabled');
-                        canResend = true;
-                    }
-                }, 1000);
-            }
-            
-            // Function to update the timer display
-            function updateTimerDisplay() {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-            
-            // Function to validate email format
-            function isValidEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
-            
-            // Function to move to next input in OTP field
-            function moveToNextInput(currentInput) {
-                const nextInputId = currentInput.getAttribute('data-next');
-                if (nextInputId) {
-                    document.getElementById(nextInputId).focus();
-                }
-            }
-            
-            // Function to move to previous input in OTP field
-            function moveToPreviousInput(currentInput) {
-                const previousInputId = currentInput.getAttribute('data-previous');
-                if (previousInputId) {
-                    document.getElementById(previousInputId).focus();
-                }
-            }
-            
-            // Event listener for Send OTP button
-            sendOtpBtn.addEventListener('click', function() {
-                const email = emailInput.value.trim();
-                
-                if (!isValidEmail(email)) {
-                    emailError.style.display = 'block';
-                    return;
-                }
-                
-                emailError.style.display = 'none';
-                sendOtp(email);
             });
             
-            // Event listener for Verify OTP button
-            verifyOtpBtn.addEventListener('click', function() {
-                const enteredOtp = digitInputs.map(input => input.value).join('');
-                const email = emailInput.value.trim();
-                
-                if (enteredOtp.length !== 6) {
-                    otpError.textContent = 'Please enter the 6-digit code';
-                    otpError.style.display = 'block';
-                    return;
+            // Close settings panel when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!settingsIcon.contains(event.target) && !settingsPanel.contains(event.target)) {
+                    settingsPanel.style.display = 'none';
                 }
-                
-                verifyOtp(enteredOtp, email);
             });
             
-            // Event listener for Resend link
-            resendLink.addEventListener('click', function(e) {
+            // Form submission
+            verifyBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                if (!canResend) return;
+                if (emailInput.value.trim() === '') {
+                    alert('Please enter your email address');
+                    return;
+                }
                 
-                const email = emailInput.value.trim();
-                sendOtp(email);
-                otpError.style.display = 'none';
+                if (!isValidEmail(emailInput.value)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
                 
-                // Clear OTP inputs
-                digitInputs.forEach(input => input.value = '');
-                digitInputs[0].focus();
+                // Simulate sending verification code
+                verifyBtn.textContent = 'Sending...';
+                verifyBtn.disabled = true;
                 
-                // Reset timers
-                startTimer();
-                startResendTimer();
+                setTimeout(function() {
+                    successMessage.style.display = 'block';
+                    verifyBtn.textContent = 'Send Verification Code';
+                    verifyBtn.disabled = false;
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                }, 1500);
             });
             
-            // Event listeners for OTP digit inputs
-            digitInputs.forEach((input, index) {
-                input.addEventListener('input', function() {
-                    if (input.value.length === 1) {
-                        moveToNextInput(input);
-                    }
-                    
-                    // Hide error when user starts typing
-                    otpError.style.display = 'none';
-                });
-                
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' && input.value === '') {
-                        moveToPreviousInput(input);
-                    }
-                });
-            });
+            // Email validation function
+            function isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
         });
     </script>
 </body>
